@@ -1,15 +1,12 @@
 package minispring;
 
+import annotation.Component;
+
 import java.io.File;
+import java.lang.reflect.Constructor;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
-
-/**
- * Created by ShinD on 25/02/2022.
- */
 import static java.util.Objects.requireNonNull;
 
 public class MySpringBootApplication {
@@ -18,6 +15,8 @@ public class MySpringBootApplication {
     private static List<Class<?>> classList = new ArrayList<>();
 
     private static String PRE_PATH_MAIN_PACKAGE;
+
+    private static Map<String, Object> beanMap = new HashMap<>(); //동시성 문제는 없을 거 같다. multiThread가 아니므로..?
 
 
 
@@ -35,7 +34,54 @@ public class MySpringBootApplication {
 
         allDirUnderMainPackage().forEach(MySpringBootApplication::addSubClassToClassList);
 
+        classList.forEach(MySpringBootApplication::setBean);
+
+/*        beanMap.keySet().stream().forEach(k -> {
+            System.out.println("name: "+ k);
+            System.out.println("bean: "+ beanMap.get(k).getClass());
+        });*/
+
         //classList.forEach(c -> System.out.println(c.getName()));
+    }
+
+    private static void setBean(Class<?> c) {
+        final Component declaredAnnotation = c.getDeclaredAnnotation(Component.class);//getAnnotation은 부모에 붙어있는 어노테이션까지 가져옴
+
+        if(declaredAnnotation != null){
+            final String beanName = beanName(c);
+            try {
+                beanMap.put(beanName, c.getDeclaredConstructor().newInstance());
+            }
+            catch (IllegalAccessException e) {
+
+                System.out.println("[WARN]"+ c.getSimpleName()+"의 생성자의 접근 제어자가 public이 아닙니다. 생성하겠지만 오류가 발생할 수 있습니다.");
+
+                createInstanceAccessLevelIsNotPublic(c, beanName);
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    private static void createInstanceAccessLevelIsNotPublic(Class<?> c, String beanName) {
+        try {
+            final Constructor<?> declaredConstructor = c.getDeclaredConstructor();
+            declaredConstructor.setAccessible(true);//public이 아니어도 생성할 수 있게
+            beanMap.put(beanName, declaredConstructor.newInstance());
+        }
+
+        catch (Exception e1) {
+            e1.printStackTrace();
+        }
+    }
+
+
+    private static String beanName(Class<?> c) {
+        final String firstChar = String.valueOf(c.getSimpleName().charAt(0));
+        final String beanName = c.getSimpleName().replace(String.valueOf(firstChar), String.valueOf(firstChar).toLowerCase());
+        return beanName;
     }
 
 
