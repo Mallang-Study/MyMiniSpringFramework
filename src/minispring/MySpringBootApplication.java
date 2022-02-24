@@ -81,8 +81,8 @@ public class MySpringBootApplication {
     public static void addSubClassToClassList(File file){
 
         if(isPackage(file)){
-            Arrays.stream(requireNonNull(file.listFiles()))
-                    .forEach(MySpringBootApplication::addSubClassToClassList);
+            Arrays.stream(requireNonNull(file.listFiles()))//패키지 하위 파일을 모두 가져와서
+                    .forEach(MySpringBootApplication::addSubClassToClassList);//재귀적으로 호출하여 수행
         }
 
         if(isClassFile(file)) {
