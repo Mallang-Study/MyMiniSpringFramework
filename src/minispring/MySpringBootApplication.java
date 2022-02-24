@@ -1,13 +1,15 @@
 package minispring;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
+
+/**
+ * Created by ShinD on 25/02/2022.
+ */
 import static java.util.Objects.requireNonNull;
 
 public class MySpringBootApplication {
@@ -16,7 +18,6 @@ public class MySpringBootApplication {
     private static List<Class<?>> classList = new ArrayList<>();
 
     private static String PRE_PATH_MAIN_PACKAGE;
-
 
 
 
@@ -30,6 +31,7 @@ public class MySpringBootApplication {
         D:\MiniSpringFramework\out\production\MiniSpringFramework 가져오기
          */
         setPrePathMainPackage();
+
 
         allDirUnderMainPackage().forEach(MySpringBootApplication::addSubClassToClassList);
 
@@ -85,7 +87,7 @@ public class MySpringBootApplication {
                     .forEach(MySpringBootApplication::addSubClassToClassList);//재귀적으로 호출하여 수행
         }
 
-        if(isClassFile(file)) {
+        else if(isClassFile(file)) {
             addClassList(file);
         }
     }
