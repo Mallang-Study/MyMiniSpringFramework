@@ -10,7 +10,7 @@ public class Test {
 
     private final C c;
 
-    public Test(C c) {
+    protected Test(C c) {
         System.out.println("Test 생성되었어용");
         this.c = c;
     }
